@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
     bio: { type: String },
     followers: { type: Number, default: 0 },
     following: { type: Number, default: 0 },
+     password: { type: String, required: true },
   },
   { timestamps: true }
 );
