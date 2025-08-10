@@ -1,6 +1,12 @@
 // models/Video.js
 const mongoose = require("mongoose");
 
+// 👇 Prevent OverwriteModelError in development
+if (mongoose.models.Video) {
+  module.exports = mongoose.model("Video");
+  return;
+}
+
 const videoSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   url: { type: String, required: true },
@@ -17,4 +23,6 @@ const videoSchema = new mongoose.Schema({
   createdAt: { type: Number, default: Date.now },
 });
 
-module.exports = mongoose.model("Video", videoSchema);
+// Create and export the model
+const Video = mongoose.model("Video", videoSchema);
+module.exports = Video;

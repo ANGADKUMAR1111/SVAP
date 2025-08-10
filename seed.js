@@ -1,6 +1,5 @@
 // seed.js
-const dotenv = require("dotenv");
-dotenv.config();
+require("dotenv").config({ silent: true }); // Suppress dotenv tips
 
 const connectDB = require("./config/db");
 const User = require("./models/User");
@@ -12,14 +11,26 @@ const { v4: uuidv4 } = require("uuid");
 // Connect to DB
 connectDB();
 
+// Helper: Hash a default password for seeded users
+const bcrypt = require("bcrypt");
+const DEFAULT_PASSWORD = "password123";
+
+const hashPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+};
+
 // Dummy Data
 const seedData = async () => {
   try {
-    // Clear existing data (optional)
+    // Clear existing data
     await User.deleteMany();
     await Video.deleteMany();
     await Comment.deleteMany();
     console.log("🗑️  Cleared existing data");
+
+    // Hash default password
+    const hashedPassword = await hashPassword(DEFAULT_PASSWORD);
 
     // Create Users
     const user1 = new User({
@@ -31,6 +42,7 @@ const seedData = async () => {
       bio: "Travel enthusiast 🌍 | Music lover 🎧",
       followers: 150,
       following: 89,
+      password: hashedPassword, // Required for login
     });
 
     const user2 = new User({
@@ -42,11 +54,12 @@ const seedData = async () => {
       bio: "Photographer 📸 | Coffee addict ☕",
       followers: 220,
       following: 104,
+      password: hashedPassword,
     });
 
     await user1.save();
     await user2.save();
-    console.log("✅ Created 2 users");
+    console.log("✅ Created 2 users (johndoe, janedoe) with password");
 
     // Create Videos
     const video1 = new Video({
@@ -132,18 +145,23 @@ const seedData = async () => {
     await comment2.save();
     await comment3.save();
 
-    // Update comments count
+    // Update videos' comments count
     video1.commentsCount = 2;
     video2.commentsCount = 1;
     await video1.save();
     await video2.save();
 
-    console.log("✅ Created 3 comments");
+    console.log("✅ Created 3 comments and updated comment counts");
 
     console.log("🎉 All dummy data inserted successfully!");
+    console.log("");
+    console.log("🔑 Login Credentials for Testing:");
+    console.log("   Username: johndoe     | Password: password123");
+    console.log("   Username: janedoe     | Password: password123");
+    console.log("");
     process.exit(0);
   } catch (err) {
-    console.error("❌ Error seeding data:", err);
+    console.error("❌ Error seeding data:", err.message || err);
     process.exit(1);
   }
 };
