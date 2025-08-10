@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-// Check if the model already exists (common in dev with nodemon)
+// Check if the model already exists (to prevent OverwriteModelError)
 if (mongoose.models.User) {
   module.exports = mongoose.model("User");
   return;
@@ -11,12 +11,13 @@ if (mongoose.models.User) {
 const userSchema = new mongoose.Schema(
   {
     id: { type: String, required: true, unique: true },
-    username: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true, trim: true },
     displayName: { type: String, required: true },
     avatarUrl: { type: String },
     bio: { type: String },
     followers: { type: Number, default: 0 },
     following: { type: Number, default: 0 },
+    password: { type: String, required: true }, // ✅ Re-added: needed for auth
   },
   { timestamps: true }
 );
@@ -34,7 +35,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Don't return password in JSON
+// Prevent password from being returned in JSON responses
 userSchema.set("toJSON", {
   transform: (doc, ret) => {
     delete ret.password;
@@ -42,6 +43,5 @@ userSchema.set("toJSON", {
   },
 });
 
-// Create and export model only if not already exists
 const User = mongoose.model("User", userSchema);
 module.exports = User;
