@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-
+const authRoutes = require("./routes/auth");
 const videoRoutes = require("./routes/videos");
 const commentRoutes = require("./routes/comments");
 const userRoutes = require("./routes/users");
@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/videos", videoRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 // DB Connection
 mongoose

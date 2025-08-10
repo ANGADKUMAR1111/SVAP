@@ -1,18 +1,18 @@
-// models/Comment.js
+// models/User.js
 const mongoose = require("mongoose");
 
-const commentSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  videoId: { type: String, required: true },
-  user: {
-    id: String,
-    username: String,
-    displayName: String,
-    avatarUrl: String,
+const userSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
+    displayName: { type: String, required: true },
+    avatarUrl: { type: String },
+    bio: { type: String },
+    followers: { type: Number, default: 0 },
+    following: { type: Number, default: 0 },
+    password: { type: String, required: true }, // ← Added
   },
-  text: { type: String, required: true },
-  timestamp: { type: Number, default: Date.now },
-  likes: { type: Number, default: 0 },
-});
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("Comment", commentSchema);
+module.exports = mongoose.model("User", userSchema);
